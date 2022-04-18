@@ -1,29 +1,32 @@
 import {
-  createContext,
   DetailedHTMLProps,
   Dispatch,
   HTMLAttributes,
   ReactNode,
   SetStateAction,
-  useContext,
   useMemo,
   useRef,
 } from "react";
 
-export const CellsContext = createContext<HTMLDivElement[][]>([]);
+type Props = {
+  rowIndex: number;
+  columnIndex: number;
+  setData: Dispatch<SetStateAction<string[][]>>;
+  setEditing: Dispatch<
+    SetStateAction<{ row: number; column: number } | undefined>
+  >;
+  cells: HTMLDivElement[][];
+  children: ReactNode;
+};
 
 export const Cell = ({
   rowIndex,
   columnIndex,
   setData,
+  setEditing,
+  cells,
   children,
-}: {
-  rowIndex: number;
-  columnIndex: number;
-  setData: Dispatch<SetStateAction<string[][]>>;
-  children: ReactNode;
-}) => {
-  const cells = useContext(CellsContext);
+}: Props) => {
   if (!cells[rowIndex]) cells[rowIndex] = [];
 
   const cellRef = useRef<HTMLDivElement>();
@@ -62,16 +65,31 @@ export const Cell = ({
             cells[rowIndex]?.[columnIndex + 1]?.focus();
             return;
           }
+          case "Enter": {
+            setEditing({ row: rowIndex, column: columnIndex });
+            return;
+          }
+          case "Backspace":
+          case "Delete": {
+            setData((prev) => {
+              if (prev[rowIndex][columnIndex] === "") return prev;
+              const data = prev.slice();
+              data[rowIndex] = prev[rowIndex].slice();
+              data[rowIndex][columnIndex] = "";
+              return data;
+            });
+            return;
+          }
         }
       },
     }),
-    [rowIndex, columnIndex, cells]
+    [rowIndex, columnIndex, cells, setData, setEditing]
   );
 
   return (
     <div
       tabIndex={0}
-      className="cursor-pointer focus:outline-none focus:ring focus:ring-cyan-500 hover:ring-1 hover:ring-slate-400 p-1"
+      className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 hover:ring-1 hover:ring-slate-300 p-1 w-32 relative"
       {...cellProps}
     >
       {children}
