@@ -3,8 +3,8 @@ import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 type Props = {
   rowIndex: number;
   columnIndex: number;
-  initialVaule: string;
-  setData: Dispatch<SetStateAction<string[][]>>;
+  initialValue: string;
+  setValues: Dispatch<SetStateAction<string[][]>>;
   setEditing: Dispatch<
     SetStateAction<{ row: number; column: number } | undefined>
   >;
@@ -14,12 +14,12 @@ type Props = {
 export const CellEditor = ({
   rowIndex,
   columnIndex,
-  initialVaule,
-  setData,
+  initialValue,
+  setValues,
   setEditing,
   cells,
 }: Props) => {
-  const [value, setValue] = useState(initialVaule);
+  const [value, setValue] = useState(initialValue);
   const didCompleteRef = useRef(false);
   return (
     <input
@@ -36,7 +36,7 @@ export const CellEditor = ({
           case "Enter": {
             e.preventDefault();
             const commitValue = e.currentTarget.value;
-            setData((prev) => {
+            setValues((prev) => {
               if (prev[rowIndex][columnIndex] === commitValue) return prev;
               const data = prev.slice();
               data[rowIndex] = prev[rowIndex].slice();
@@ -62,7 +62,7 @@ export const CellEditor = ({
       onBlur={(e) => {
         if (didCompleteRef.current) return;
         const commitValue = e.currentTarget.value;
-        setData((prev) => {
+        setValues((prev) => {
           if (prev[rowIndex][columnIndex] === commitValue) return prev;
           const data = prev.slice();
           data[rowIndex] = prev[rowIndex].slice();

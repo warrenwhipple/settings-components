@@ -2,34 +2,38 @@ import {
   DetailedHTMLProps,
   Dispatch,
   HTMLAttributes,
-  ReactNode,
   SetStateAction,
   useMemo,
   useRef,
 } from "react";
+import { CellEditor } from "./CellEditor";
+import { keyCategories } from "./keyCategories";
 
 type Props = {
   rowIndex: number;
   columnIndex: number;
-  setData: Dispatch<SetStateAction<string[][]>>;
+  value: string;
+  setValues: Dispatch<SetStateAction<string[][]>>;
+  isEditing: boolean;
   setEditing: Dispatch<
     SetStateAction<{ row: number; column: number } | undefined>
   >;
   cells: HTMLDivElement[][];
-  children: ReactNode;
 };
 
 export const Cell = ({
   rowIndex,
   columnIndex,
-  setData,
+  value,
+  setValues,
+  isEditing,
   setEditing,
   cells,
-  children,
 }: Props) => {
   if (!cells[rowIndex]) cells[rowIndex] = [];
 
   const cellRef = useRef<HTMLDivElement>();
+  const inputRef = useRef("");
 
   const cellProps = useMemo<
     Partial<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>>
@@ -46,9 +50,9 @@ export const Cell = ({
           delete cells[rowIndex][columnIndex];
         }
       },
-      onClick: (e) => {},
       onKeyDown: (e) => {
-        switch (e.key) {
+        const { key } = e;
+        switch (key) {
           case "ArrowUp": {
             cells[rowIndex - 1]?.[columnIndex]?.focus();
             return;
@@ -71,7 +75,7 @@ export const Cell = ({
           }
           case "Backspace":
           case "Delete": {
-            setData((prev) => {
+            setValues((prev) => {
               if (prev[rowIndex][columnIndex] === "") return prev;
               const data = prev.slice();
               data[rowIndex] = prev[rowIndex].slice();
@@ -81,9 +85,10 @@ export const Cell = ({
             return;
           }
         }
+        if (key === " " || !keyCategories[key]) inputRef.current += key;
       },
     }),
-    [rowIndex, columnIndex, cells, setData, setEditing]
+    [rowIndex, columnIndex, cells, setValues, setEditing]
   );
 
   return (
@@ -92,7 +97,17 @@ export const Cell = ({
       className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 hover:ring-1 hover:ring-slate-300 p-1 w-32 relative"
       {...cellProps}
     >
-      {children}
+      {isEditing && (
+        <CellEditor
+          rowIndex={rowIndex}
+          columnIndex={columnIndex}
+          initialValue={value}
+          setValues={setValues}
+          setEditing={setEditing}
+          cells={cells}
+        />
+      )}
+      {value}
     </div>
   );
 };
