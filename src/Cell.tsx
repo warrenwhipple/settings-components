@@ -16,7 +16,7 @@ type Props = {
   setValues: Dispatch<SetStateAction<string[][]>>;
   isEditing: boolean;
   setEditing: Dispatch<
-    SetStateAction<{ row: number; column: number } | undefined>
+    SetStateAction<{ rowIndex: number; columnIndex: number } | undefined>
   >;
   cells: HTMLDivElement[][];
 };
@@ -33,9 +33,9 @@ export const Cell = ({
   if (!cells[rowIndex]) cells[rowIndex] = [];
 
   const cellRef = useRef<HTMLDivElement>();
-  const inputRef = useRef("");
+  const clearRef = useRef(false);
 
-  const cellProps = useMemo<
+  const divProps = useMemo<
     Partial<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>>
   >(
     () => ({
@@ -70,7 +70,8 @@ export const Cell = ({
             return;
           }
           case "Enter": {
-            setEditing({ row: rowIndex, column: columnIndex });
+            clearRef.current = false;
+            setEditing({ rowIndex, columnIndex });
             return;
           }
           case "Backspace":
@@ -85,7 +86,10 @@ export const Cell = ({
             return;
           }
         }
-        if (key === " " || !keyCategories[key]) inputRef.current += key;
+        if (key === " " || !keyCategories[key]) {
+          clearRef.current = true;
+          setEditing({ rowIndex, columnIndex });
+        }
       },
     }),
     [rowIndex, columnIndex, cells, setValues, setEditing]
@@ -95,13 +99,14 @@ export const Cell = ({
     <div
       tabIndex={0}
       className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 hover:ring-1 hover:ring-slate-300 p-1 w-32 relative"
-      {...cellProps}
+      ref={divProps.ref}
+      onKeyDown={isEditing ? undefined : divProps.onKeyDown}
     >
       {isEditing && (
         <CellEditor
           rowIndex={rowIndex}
           columnIndex={columnIndex}
-          initialValue={value}
+          initialInputValue={clearRef.current ? "" : value}
           setValues={setValues}
           setEditing={setEditing}
           cells={cells}

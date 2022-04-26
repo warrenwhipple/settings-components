@@ -3,10 +3,10 @@ import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 type Props = {
   rowIndex: number;
   columnIndex: number;
-  initialValue: string;
+  initialInputValue: string;
   setValues: Dispatch<SetStateAction<string[][]>>;
   setEditing: Dispatch<
-    SetStateAction<{ row: number; column: number } | undefined>
+    SetStateAction<{ rowIndex: number; columnIndex: number } | undefined>
   >;
   cells: HTMLDivElement[][];
 };
@@ -14,21 +14,21 @@ type Props = {
 export const CellEditor = ({
   rowIndex,
   columnIndex,
-  initialValue,
+  initialInputValue,
   setValues,
   setEditing,
   cells,
 }: Props) => {
-  const [value, setValue] = useState(initialValue);
+  const [inputValue, setInputValue] = useState(initialInputValue);
   const didCompleteRef = useRef(false);
   return (
     <input
       className="focus:outline-none block absolute top-0 right-0 bottom-0 left-0 p-1 w-32 ring ring-cyan-500 shadow-xl"
       autoFocus
-      value={value}
+      value={inputValue}
       onChange={(e) => {
         const value = e.target.value;
-        setValue(value);
+        setInputValue(value);
       }}
       onKeyDown={(e) => {
         e.stopPropagation();

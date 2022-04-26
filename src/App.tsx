@@ -9,9 +9,10 @@ const initialData: string[][] = [
 
 export const App = () => {
   const [values, setValues] = useState(initialData);
+
   const [editing, setEditing] = useState<{
-    row: number;
-    column: number;
+    rowIndex: number;
+    columnIndex: number;
   }>();
 
   const cellsRef = useRef<HTMLDivElement[][]>();
@@ -30,7 +31,9 @@ export const App = () => {
                 value={value}
                 setValues={setValues}
                 isEditing={
-                  !!editing && editing.row === i && editing.column === j
+                  !!editing &&
+                  editing.rowIndex === i &&
+                  editing.columnIndex === j
                 }
                 setEditing={setEditing}
                 cells={cellsRef.current!}
