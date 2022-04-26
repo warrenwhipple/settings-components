@@ -6,8 +6,8 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { keyCategories } from "../keyCategories";
 import { CellEditor } from "./CellEditor";
-import { keyCategories } from "./keyCategories";
 
 type Props = {
   rowIndex: number;

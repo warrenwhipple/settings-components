@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Cell } from "./Cell";
+import { useState } from "react";
+import { InputGrid } from "./InputGrid/InputGrid";
 
 const initialData: string[][] = [
   ["alpha", "beta", "gamma"],
@@ -10,38 +10,9 @@ const initialData: string[][] = [
 export const App = () => {
   const [values, setValues] = useState(initialData);
 
-  const [editing, setEditing] = useState<{
-    rowIndex: number;
-    columnIndex: number;
-  }>();
-
-  const cellsRef = useRef<HTMLDivElement[][]>();
-  if (!cellsRef.current) cellsRef.current = [];
-
   return (
     <div className="h-screen flex justify-center items-center">
-      <div className="flex flex-col">
-        {values.map((row, i) => (
-          <div key={i} className="flex">
-            {row.map((value, j) => (
-              <Cell
-                key={j}
-                rowIndex={i}
-                columnIndex={j}
-                value={value}
-                setValues={setValues}
-                isEditing={
-                  !!editing &&
-                  editing.rowIndex === i &&
-                  editing.columnIndex === j
-                }
-                setEditing={setEditing}
-                cells={cellsRef.current!}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+      <InputGrid values={values} setValues={setValues} />
     </div>
   );
 };
