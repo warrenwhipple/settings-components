@@ -1,12 +1,12 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
-import { InputCell } from "./InputCell";
+import { ComboboxCell } from "./ComboboxCell";
 
 type Props = {
   values: string[][];
   setValues: Dispatch<SetStateAction<string[][]>>;
 };
 
-export const InputGrid = ({ values, setValues }: Props) => {
+export const ComboboxGrid = ({ values, setValues }: Props) => {
   const [editing, setEditing] = useState<{
     rowIndex: number;
     columnIndex: number;
@@ -20,7 +20,7 @@ export const InputGrid = ({ values, setValues }: Props) => {
       {values.map((row, i) => (
         <div key={i} className="flex">
           {row.map((value, j) => (
-            <InputCell
+            <ComboboxCell
               key={j}
               rowIndex={i}
               columnIndex={j}

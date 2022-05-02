@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { InputGrid } from "./InputGrid/InputGrid";
+import { ComboboxGrid } from "./ComboboxGrid/ComboboxGrid";
 
 const initialData: string[][] = [
   ["alpha", "beta", "gamma"],
@@ -11,8 +12,9 @@ export const App = () => {
   const [values, setValues] = useState(initialData);
 
   return (
-    <div className="h-screen flex justify-center items-center">
+    <div className="flex h-screen flex-col items-center justify-evenly">
       <InputGrid values={values} setValues={setValues} />
+      <ComboboxGrid values={values} setValues={setValues} />
     </div>
   );
 };

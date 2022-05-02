@@ -7,7 +7,7 @@ import {
   useRef,
 } from "react";
 import { keyCategories } from "../keyCategories";
-import { CellEditor } from "./CellEditor";
+import { ComboboxCellEditor } from "./ComboboxCellEditor";
 
 type Props = {
   rowIndex: number;
@@ -21,7 +21,7 @@ type Props = {
   cells: HTMLDivElement[][];
 };
 
-export const Cell = ({
+export const ComboboxCell = ({
   rowIndex,
   columnIndex,
   value,
@@ -98,21 +98,22 @@ export const Cell = ({
   return (
     <div
       tabIndex={0}
-      className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500 hover:ring-1 hover:ring-slate-300 p-1 w-32 relative"
+      className="relative w-32 cursor-pointer hover:ring-1 hover:ring-slate-300 focus:z-10 focus:bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
       ref={divProps.ref}
       onKeyDown={isEditing ? undefined : divProps.onKeyDown}
     >
+      <div className="p-1">{value}</div>
       {isEditing && (
-        <CellEditor
+        <ComboboxCellEditor
           rowIndex={rowIndex}
           columnIndex={columnIndex}
+          selectedValue={value}
           initialInputValue={clearRef.current ? "" : value}
           setValues={setValues}
           setEditing={setEditing}
           cells={cells}
         />
       )}
-      {value}
     </div>
   );
 };

@@ -11,7 +11,7 @@ type Props = {
   cells: HTMLDivElement[][];
 };
 
-export const CellEditor = ({
+export const InputCellEditor = ({
   rowIndex,
   columnIndex,
   initialInputValue,
@@ -23,7 +23,7 @@ export const CellEditor = ({
   const didCompleteRef = useRef(false);
   return (
     <input
-      className="focus:outline-none block absolute top-0 right-0 bottom-0 left-0 p-1 w-32 ring ring-cyan-500 shadow-xl"
+      className="absolute top-0 right-0 bottom-0 left-0 z-20 block w-32 p-1 shadow-xl ring ring-cyan-500 focus:outline-none"
       autoFocus
       value={inputValue}
       onChange={(e) => {
@@ -38,10 +38,10 @@ export const CellEditor = ({
             const commitValue = e.currentTarget.value;
             setValues((prev) => {
               if (prev[rowIndex][columnIndex] === commitValue) return prev;
-              const data = prev.slice();
-              data[rowIndex] = prev[rowIndex].slice();
-              data[rowIndex][columnIndex] = commitValue;
-              return data;
+              const values = prev.slice();
+              values[rowIndex] = prev[rowIndex].slice();
+              values[rowIndex][columnIndex] = commitValue;
+              return values;
             });
             setEditing(undefined);
             didCompleteRef.current = true;
