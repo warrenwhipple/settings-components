@@ -83,7 +83,7 @@ export const ComboboxCellEditor = ({
       }}
     >
       <Combobox.Input
-        className="absolute top-0 right-0 bottom-0 left-0 block w-32 p-1 shadow-xl ring ring-cyan-500 focus:outline-none"
+        className="absolute top-0 right-0 bottom-0 left-0 z-20 block w-32 p-1 ring ring-cyan-500 focus:outline-none"
         autoFocus
         value={inputValue}
         onChange={(e) => {
@@ -111,12 +111,12 @@ export const ComboboxCellEditor = ({
           didCompleteRef.current = true;
         }}
       />
-      <Combobox.Options className="absolute top-full z-10 w-full bg-white">
+      <Combobox.Options className="absolute top-full z-10 w-full border border-slate-300 bg-white pt-0.5 shadow-xl">
         {filteredOptions.map((option) => (
           <Combobox.Option as={Fragment} key={option} value={option}>
             {({ active, selected }) => (
               <li
-                className={`${active ? "bg-slate-100" : ""} ${
+                className={`px-1 py-0.5 ${active ? "bg-slate-100" : ""} ${
                   selected ? "bg-cyan-500 text-white" : ""
                 }`}
               >
