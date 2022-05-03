@@ -40,7 +40,7 @@ type Props = {
   rowIndex: number;
   columnIndex: number;
   selectedValue: string;
-  initialInputValue: string;
+  initialInputValue: string | null;
   setValues: Dispatch<SetStateAction<string[][]>>;
   setEditing: Dispatch<
     SetStateAction<{ rowIndex: number; columnIndex: number } | undefined>
@@ -57,11 +57,14 @@ export const ComboboxCellEditor = ({
   setEditing,
   cells,
 }: Props) => {
-  const [inputValue, setInputValue] = useState(initialInputValue);
+  const [inputValue, setInputValue] = useState(
+    initialInputValue ?? selectedValue
+  );
+  const didEditRef = useRef(initialInputValue !== null);
   const didCompleteRef = useRef(false);
 
   const filteredOptions =
-    inputValue === ""
+    !didEditRef.current || inputValue === ""
       ? options
       : options.filter((option) =>
           option.toLowerCase().includes(inputValue.toLowerCase())
@@ -71,6 +74,7 @@ export const ComboboxCellEditor = ({
     <Combobox
       value={selectedValue}
       onChange={(commitValue) => {
+        didCompleteRef.current = true;
         setValues((prev) => {
           if (prev[rowIndex][columnIndex] === commitValue) return prev;
           const values = prev.slice();
@@ -79,7 +83,6 @@ export const ComboboxCellEditor = ({
           return values;
         });
         setEditing(undefined);
-        didCompleteRef.current = true;
       }}
     >
       <Combobox.Input
@@ -87,6 +90,7 @@ export const ComboboxCellEditor = ({
         autoFocus
         value={inputValue}
         onChange={(e) => {
+          didEditRef.current = true;
           const value = e.target.value;
           setInputValue(value);
         }}
@@ -111,7 +115,10 @@ export const ComboboxCellEditor = ({
           didCompleteRef.current = true;
         }}
       />
-      <Combobox.Options className="absolute top-full z-10 w-full border border-slate-300 bg-white pt-0.5 shadow-xl">
+      <Combobox.Options
+        className="absolute top-full z-10 w-full border border-slate-300 bg-white pt-0.5 shadow-xl"
+        static
+      >
         {filteredOptions.map((option) => (
           <Combobox.Option as={Fragment} key={option} value={option}>
             {({ active, selected }) => (

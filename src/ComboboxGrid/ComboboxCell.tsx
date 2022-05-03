@@ -2,10 +2,12 @@ import {
   DetailedHTMLProps,
   Dispatch,
   HTMLAttributes,
+  MouseEventHandler,
   SetStateAction,
   useMemo,
   useRef,
 } from "react";
+import { ChevronDownSolidIcon } from "../icons";
 import { keyCategories } from "../keyCategories";
 import { ComboboxCellEditor } from "./ComboboxCellEditor";
 
@@ -35,61 +37,71 @@ export const ComboboxCell = ({
   const cellRef = useRef<HTMLDivElement>();
   const clearRef = useRef(false);
 
-  const divProps = useMemo<
-    Partial<DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>>
-  >(
+  const { divProps, buttonOnClick } = useMemo<{
+    divProps: Partial<
+      DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+    >;
+    buttonOnClick: MouseEventHandler<HTMLButtonElement>;
+  }>(
     () => ({
-      ref: (el) => {
-        if (el) {
-          cellRef.current = el;
-          cells[rowIndex][columnIndex] = el;
-        } else if (
-          cellRef.current &&
-          cellRef.current === cells[rowIndex][columnIndex]
-        ) {
-          delete cells[rowIndex][columnIndex];
-        }
-      },
-      onKeyDown: (e) => {
-        const { key } = e;
-        switch (key) {
-          case "ArrowUp": {
-            cells[rowIndex - 1]?.[columnIndex]?.focus();
-            return;
+      divProps: {
+        ref: (el) => {
+          if (el) {
+            cellRef.current = el;
+            cells[rowIndex][columnIndex] = el;
+          } else if (
+            cellRef.current &&
+            cellRef.current === cells[rowIndex][columnIndex]
+          ) {
+            delete cells[rowIndex][columnIndex];
           }
-          case "ArrowDown": {
-            cells[rowIndex + 1]?.[columnIndex]?.focus();
-            return;
+        },
+        onKeyDown: (e) => {
+          const { key } = e;
+          switch (key) {
+            case "ArrowUp": {
+              cells[rowIndex - 1]?.[columnIndex]?.focus();
+              return;
+            }
+            case "ArrowDown": {
+              cells[rowIndex + 1]?.[columnIndex]?.focus();
+              return;
+            }
+            case "ArrowLeft": {
+              cells[rowIndex]?.[columnIndex - 1]?.focus();
+              return;
+            }
+            case "ArrowRight": {
+              cells[rowIndex]?.[columnIndex + 1]?.focus();
+              return;
+            }
+            case "Enter":
+            case " ": {
+              clearRef.current = false;
+              setEditing({ rowIndex, columnIndex });
+              return;
+            }
+            case "Backspace":
+            case "Delete": {
+              setValues((prev) => {
+                if (prev[rowIndex][columnIndex] === "") return prev;
+                const data = prev.slice();
+                data[rowIndex] = prev[rowIndex].slice();
+                data[rowIndex][columnIndex] = "";
+                return data;
+              });
+              return;
+            }
           }
-          case "ArrowLeft": {
-            cells[rowIndex]?.[columnIndex - 1]?.focus();
-            return;
-          }
-          case "ArrowRight": {
-            cells[rowIndex]?.[columnIndex + 1]?.focus();
-            return;
-          }
-          case "Enter": {
-            clearRef.current = false;
+          if (!keyCategories[key]) {
+            clearRef.current = true;
             setEditing({ rowIndex, columnIndex });
-            return;
           }
-          case "Backspace":
-          case "Delete": {
-            setValues((prev) => {
-              if (prev[rowIndex][columnIndex] === "") return prev;
-              const data = prev.slice();
-              data[rowIndex] = prev[rowIndex].slice();
-              data[rowIndex][columnIndex] = "";
-              return data;
-            });
-            return;
-          }
-        }
-        if (key === " " || !keyCategories[key]) {
-          clearRef.current = true;
-          setEditing({ rowIndex, columnIndex });
-        }
+        },
+      },
+      buttonOnClick: () => {
+        clearRef.current = false;
+        setEditing({ rowIndex, columnIndex });
       },
     }),
     [rowIndex, columnIndex, cells, setValues, setEditing]
@@ -102,7 +114,16 @@ export const ComboboxCell = ({
       ref={divProps.ref}
       onKeyDown={isEditing ? undefined : divProps.onKeyDown}
     >
-      <div className="p-1">{value}</div>
+      <div className="flex">
+        <div className="flex-1 p-1">{value}</div>
+        <button
+          className="m-1 rounded-md text-slate-300 hover:bg-slate-400 hover:text-white"
+          tabIndex={-1}
+          onClick={buttonOnClick}
+        >
+          <ChevronDownSolidIcon className="h-6 w-6" />
+        </button>
+      </div>
       {isEditing && (
         <ComboboxCellEditor
           rowIndex={rowIndex}
