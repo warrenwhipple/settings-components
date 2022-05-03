@@ -35,7 +35,7 @@ export const ComboboxCell = ({
   if (!cells[rowIndex]) cells[rowIndex] = [];
 
   const cellRef = useRef<HTMLDivElement>();
-  const clearRef = useRef(false);
+  const initialInputRef = useRef<string | null>(null);
 
   const { divProps, buttonOnClick } = useMemo<{
     divProps: Partial<
@@ -75,9 +75,8 @@ export const ComboboxCell = ({
               cells[rowIndex]?.[columnIndex + 1]?.focus();
               return;
             }
-            case "Enter":
-            case " ": {
-              clearRef.current = false;
+            case "Enter": {
+              initialInputRef.current = null;
               setEditing({ rowIndex, columnIndex });
               return;
             }
@@ -93,14 +92,14 @@ export const ComboboxCell = ({
               return;
             }
           }
-          if (!keyCategories[key]) {
-            clearRef.current = true;
+          if (key === " " || !keyCategories[key]) {
+            initialInputRef.current = "";
             setEditing({ rowIndex, columnIndex });
           }
         },
       },
       buttonOnClick: () => {
-        clearRef.current = false;
+        initialInputRef.current = null;
         setEditing({ rowIndex, columnIndex });
       },
     }),
@@ -129,7 +128,7 @@ export const ComboboxCell = ({
           rowIndex={rowIndex}
           columnIndex={columnIndex}
           selectedValue={value}
-          initialInputValue={clearRef.current ? "" : value}
+          initialInputValue={initialInputRef.current}
           setValues={setValues}
           setEditing={setEditing}
           cells={cells}
